@@ -85,6 +85,32 @@ program
     }
   });
 
+program
+  .command('set-api-key')
+  .description('Set OpenRouter or OpenAI API key')
+  .option('--openrouter <key>', 'OpenRouter API key')
+  .option('--openai <key>', 'OpenAI API key')
+  .action((options) => {
+    try {
+      configManager.load();
+      if (options.openrouter) {
+        configManager.setOpenrouterApiKey(options.openrouter);
+        logger.success('OpenRouter API key saved successfully!');
+      }
+      if (options.openai) {
+        configManager.setOpenaiApiKey(options.openai);
+        logger.success('OpenAI API key saved successfully!');
+      }
+      if (!options.openrouter && !options.openai) {
+        logger.error('Please provide either --openrouter or --openai option');
+        process.exit(1);
+      }
+    } catch (error) {
+      logger.error(`Failed to save API key: ${error}`);
+      process.exit(1);
+    }
+  });
+
 // Repository Commands
 program
   .command('repo:info <repoUrl>')
