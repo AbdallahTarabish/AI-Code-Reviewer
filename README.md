@@ -332,129 +332,140 @@ npm run build
 - Identifies security vulnerabilities
 - Recommends best practices
 
-1. **Trigger**: Action runs on PR open/update
-2. **Fetch**: Retrieves PR diff and file changes
-3. **Filter**: Applies exclusion patterns
-4. **Process**: Sends code chunks to AI model
-5. **Review**: AI analyzes code for:
-   - Bugs and potential issues
-   - Code quality improvements
-   - Best practice suggestions
-   - Security vulnerabilities
-6. **Comment**: Posts review comments on specific lines
+## 💡 Tips & Best Practices
 
-## 🔍 Features Deep Dive
+1. **Use DeepSeek for Cost-Effective Reviews**
+   ```bash
+   --ai-model deepseek/deepseek-chat-v3-0324
+   ```
+   Fast, accurate, and very affordable
 
-### Large PR Support
-- **Progress Tracking**: Saves progress for large PRs
-- **Resume Capability**: Continues from where it left off
-- **Batch Processing**: Handles files in manageable batches
-- **Memory Efficient**: Processes files individually
+2. **Check PR Info Before Analyzing**
+   ```bash
+   ai-code-reviewer pr:info owner/repo 123
+   ```
+   Verify PR size and changes before running expensive AI analysis
 
-### Error Handling
-- **Response Format Detection**: Handles various AI model response formats
-- **JSON Parsing**: Robust parsing with multiple fallbacks
-- **Rate Limit Handling**: Automatic retry with backoff
-- **Partial Response Recovery**: Extracts useful content from truncated responses
+3. **Store API Keys Securely**
+   - Don't commit API keys to repositories
+   - Use environment variables in CI/CD
+   - Store locally for development
 
-### Model Compatibility
-- **OpenAI Models**: GPT-3.5, GPT-4, GPT-4 Turbo
-- **Anthropic Models**: Claude 3 (Opus, Sonnet, Haiku)
-- **Google Models**: Gemini Pro, Gemini Flash
-- **Meta Models**: Llama 3.1 series
-- **DeepSeek Models**: DeepSeek Chat v3
-- **And 100+ more via OpenRouter**
+4. **Verify Token Regularly**
+   ```bash
+   ai-code-reviewer verify-token
+   ```
+   Ensure your GitHub token is valid
 
-## 🛠️ Troubleshooting
+5. **Use Repository Shortcuts**
+   ```bash
+   # Both formats work
+   ai-code-reviewer repo:info owner/repo
+   ai-code-reviewer repo:info https://github.com/owner/repo
+   ```
 
-### Common Issues
+## 📚 Additional Documentation
 
-**Reviews appear as "github-actions[bot]"**
-- Use `PERSONAL_GITHUB_TOKEN` instead of `GITHUB_TOKEN`
+- **[CLI_GUIDE.md](CLI_GUIDE.md)** - Complete CLI reference with all commands and examples
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Quick command reference card
+- **[UPGRADE_GUIDE.md](UPGRADE_GUIDE.md)** - Migration guide from older versions
 
-**JSON parsing errors**
-- Usually resolved automatically with built-in fallbacks
-- Check model compatibility
+## 🎯 Real-World Workflows
 
-**Rate limiting**
-- Built-in retry mechanism handles this automatically
-- Consider using OpenRouter for higher limits
+### Daily Development Workflow
 
-**Large PR timeouts**
-- Progress is automatically saved and resumed
-- Use file exclusion patterns to reduce scope
+```bash
+# Morning: Check what's new
+ai-code-reviewer repo:branches owner/repo
 
-**CLI token issues**
-- Run `ai-code-reviewer logout` then `ai-code-reviewer login` to re-authenticate
-- Check `~/.ai-code-reviewer/config.json` exists
+# Review a colleague's PR
+ai-code-reviewer pr:info owner/repo 456
+ai-code-reviewer analyze owner/repo 456 --ai-key $OPENROUTER_KEY
 
-### Debug Mode
-
-Enable detailed logging by setting environment variable:
-```yaml
-env:
-  DEBUG: "true"
+# Quick repo check
+ai-code-reviewer repo:info owner/repo
 ```
 
-## 📈 Performance Tips
+### Code Review Session
 
-1. **Use Exclusion Patterns**: Skip unnecessary files (docs, configs, lockfiles)
-2. **Choose Efficient Models**: DeepSeek is fast and cost-effective
-3. **Limit PR Size**: Keep PRs under 20,000 lines when possible
-4. **Personal Tokens**: Use personal tokens to avoid rate limits
-
-## 🧪 Local Testing
-
-### Using CLI
 ```bash
-# Authenticate
-ai-code-reviewer login
-
-# Test repository access
-ai-code-reviewer repo:info owner/repo
-
-# Test PR retrieval
+# 1. List recent PRs (use GitHub web for this)
+# 2. Get details
 ai-code-reviewer pr:info owner/repo 123
 
-# Perform analysis
-ai-code-reviewer analyze owner/repo 123
+# 3. Analyze if needed
+ai-code-reviewer analyze owner/repo 123 \
+  --ai-key $OPENROUTER_KEY \
+  --ai-model deepseek/deepseek-chat-v3-0324
+
+# 4. Review output and provide feedback
 ```
 
-### Using Environment Variables
+### Repository Audit
+
 ```bash
-# Create .env file
-cp .env.example .env
+# Check repository health
+ai-code-reviewer repo:info owner/repo
 
-# Edit .env with your tokens
-GITHUB_TOKEN=ghp_xxxxx
-OPENROUTER_API_KEY=sk-or-v1-xxxxx
+# Review branch structure
+ai-code-reviewer repo:branches owner/repo
 
-# Run local test
-npm install
-npm run build
-npm run test:local
+# Analyze key PRs
+ai-code-reviewer pr:info owner/repo 100
+ai-code-reviewer pr:info owner/repo 200
 ```
 
-## 📚 Documentation
+## 🔐 Security
 
-- **[CLI_GUIDE.md](CLI_GUIDE.md)** - Complete CLI reference and examples
-- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Quick command reference
-- **[UPGRADE_GUIDE.md](UPGRADE_GUIDE.md)** - Migration guide from older versions
+- **Token Storage**: Credentials stored in `~/.ai-code-reviewer/config.json` (600 permissions recommended)
+- **API Keys**: Never logged or exposed in output
+- **GitHub Access**: Only requests necessary permissions
+- **Local Processing**: Analysis happens locally, not on external servers
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! This is an open-source project.
+
+**Ways to contribute:**
+- Report bugs
+- Suggest features
+- Submit pull requests
+- Improve documentation
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details
 
-## 🌟 Support
+## 🆘 Support
 
-If you find this project helpful, please give it a ⭐ star!
+- **Documentation**: Read [CLI_GUIDE.md](CLI_GUIDE.md) for detailed help
+- **Issues**: [Open an issue](https://github.com/your-username/ai-codereviewer/issues) on GitHub
+- **Questions**: Check existing issues or create a new one
 
-For issues and feature requests, please [open an issue](https://github.com/your-username/ai-codereviewer/issues).
+## 🌟 Show Your Support
+
+If you find this tool useful, please give it a ⭐ star on GitHub!
 
 ---
 
-*Made with ❤️ for better code reviews*
+**Quick Command Reference:**
+
+```bash
+# Setup
+ai-code-reviewer login
+
+# Repository
+ai-code-reviewer repo:info <owner/repo>
+ai-code-reviewer repo:branches <owner/repo>
+
+# Pull Request
+ai-code-reviewer pr:info <owner/repo> <number>
+ai-code-reviewer analyze <owner/repo> <number> --ai-key <key>
+
+# Configuration
+ai-code-reviewer config
+ai-code-reviewer verify-token
+ai-code-reviewer logout
+```
+
+*Made with ❤️ for developers who care about code quality*
