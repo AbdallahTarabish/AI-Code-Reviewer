@@ -20,6 +20,7 @@ interface AnalysisResult {
 class AnalyzerService {
   private octokit: Octokit;
   private openai: OpenAI;
+  private apiModel: string;
   private excludePatterns: string[] = [
     '**/node_modules/**',
     '**/.git/**',
@@ -37,6 +38,7 @@ class AnalyzerService {
     apiBaseUrl: string = 'https://openrouter.ai/api/v1'
   ) {
     this.octokit = new Octokit({ auth: githubToken });
+    this.apiModel = apiModel;
     this.openai = new OpenAI({
       apiKey,
       baseURL: apiBaseUrl,
@@ -175,12 +177,23 @@ Only include reviews for actual issues found. If no issues, respond with {"revie
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'default',
+        model: this.apiModel,
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1000,
       });
 
-      const content = response.choices[0]?.message?.content || '{}';
+      let content = response.choices[0]?.message?.content || '{}';
+      
+      // Strip markdown code blocks if present
+      content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      // Try to extract JSON from text by finding the first { and last }
+      const firstBrace = content.indexOf('{');
+      const lastBrace = content.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        content = content.substring(firstBrace, lastBrace + 1);
+      }
+      
       const parsed = JSON.parse(content);
 
       if (parsed.reviews && Array.isArray(parsed.reviews)) {
@@ -193,7 +206,8 @@ Only include reviews for actual issues found. If no issues, respond with {"revie
         }
       }
     } catch (error: any) {
-      console.warn(`⚠️  Failed to analyze ${file.to}: ${error.message}`);
+      // Silently skip files that can't be parsed - they may not need review
+      // console.warn(`⚠️  Failed to analyze ${file.to}: ${error.message}`);
     }
 
     return comments;
