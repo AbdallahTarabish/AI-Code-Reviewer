@@ -1,0 +1,37 @@
+name: "AI Code Review Action"
+description: "Perform code reviews and comment on diffs using OpenAI or OpenRouter API."
+inputs:
+  GITHUB_TOKEN:
+    description: "GitHub token to interact with the repository."
+    required: true
+  OPENAI_API_KEY:
+    description: "OpenAI API key for GPT (fallback if OPENROUTER_API_KEY is not provided)."
+    required: false
+  OPENAI_API_MODEL:
+    description: "OpenAI API model (fallback if OPENROUTER_API_MODEL is not provided)."
+    required: false
+    default: "gpt-4"
+  OPENROUTER_API_KEY:
+    description: "OpenRouter API key."
+    required: false
+  OPENROUTER_API_MODEL:
+    description: "OpenRouter API model name (e.g., 'deepseek/deepseek-chat-v3-0324', 'anthropic/claude-2', etc)."
+    required: false
+    default: "deepseek/deepseek-chat-v3-0324"
+  OPENROUTER_BASE_URL:
+    description: "OpenRouter API base URL."
+    required: false
+    default: "https://openrouter.ai/api/v1"
+  exclude:
+    description: "Glob patterns to exclude files from the diff analysis"
+    required: false
+    default: ""
+  PR_NUMBER:
+    description: "PR number to review (for manual workflow dispatch)"
+    required: false
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  icon: "aperture"
+  color: "green"
